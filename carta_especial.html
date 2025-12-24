@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carta con Alas que se Levantan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Helvetica", serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f9d5e5 0%, #e2f0ff 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-x: hidden;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .title {
+        text-align: center;
+        color: #b33971;
+        margin-bottom: 10px;
+      }
+
+      .title h1 {
+        font-size: 2.5rem;
+        margin-bottom: 5px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .title p {
+        font-size: 1.1rem;
+        color: #777;
+        font-style: italic;
+      }
+
+      .card-container {
+        position: relative;
+        width: 100%;
+        height: 600px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Estilos para la primera pantalla (alas hacia abajo con corazón detrás) */
+      .initial-scene {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s ease 1.2s;
+      }
+
+      .initial-scene-content {
+        position: relative;
+        width: 500px;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Corazón detrás de las alas */
+      .heart-behind {
+        position: absolute;
+        width: auto;
+        height: 220px;
+        z-index: 1; /* Detrás de las alas */
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+        opacity: 0.7; /* Un poco transparente para que se note que está detrás */
+      }
+
+      .titulo {
+        margin: auto 0;
+        opacity: 0;
+        font-size: xx-large;
+        font-weight: 600;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Alas hacia abajo delante del corazón */
+      .wing-down-left,
+      .wing-down-right {
+        position: absolute;
+        width: max-content;
+        height: 250px;
+        z-index: 2; /* Delante del corazón */
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.421));
+        transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      }
+
+      .wing-down-left {
+        right: 180px;
+        top: 110px; /* Posición inicial más abajo */
+        transform: rotate(30deg) scaleX(-1);
+        transform-origin: top right;
+      }
+
+      .wing-down-right {
+        left: -100px;
+        top: 110px; /* Posición inicial más abajo */
+        transform: rotate(-35deg);
+        transform-origin: top right;
+      }
+
+      .click-instruction {
+        position: absolute;
+        bottom: -40px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: #b33971;
+        font-size: 1.2rem;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      /* Estilos para la segunda pantalla (carta abierta) */
+      .letter-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.8s ease 1.5s;
+      }
+
+      /* Alas extendidas detrás del corazón en la segunda pantalla */
+      .wings-extended-container {
+        min-width: 900px;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+      }
+
+      .wing-extended-left,
+      .wing-extended-right {
+        position: absolute;
+        width: max-content;
+        height: 260px;
+        z-index: 1;
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+        transform-origin: top right;
+        left: 215px;
+        top: -83px;
+        /*animation: flap 1.5s ease infinite;*/
+      }
+
+      .wing-extended-left {
+        left: 100px;
+        transform: rotate(-15deg);
+        animation: flap 8.01s ease infinite;
+      }
+
+      .wing-extended-right {
+        transform: rotate(15deg) scaleX(-1);
+        animation: flapX 8s ease infinite;
+      }
+
+      .open-heart {
+        position: relative;
+        height: 250px;
+        margin-bottom: 30px;
+        z-index: 2;
+        animation: heartbeat 1.5s ease infinite;
+        filter: drop-shadow(0 10px 20px rgba(227, 27, 35, 0.4));
+      }
+
+      @keyframes flap {
+        0% {
+          transform: rotate(-10deg);
+        }
+        10% {
+          transform: rotate(0deg);
+        }
+        24% {
+          transform: rotate(-30deg);
+        }
+        41% {
+          transform: rotate(-3deg);
+        }
+        63% {
+          transform: rotate(-22deg);
+        }
+        78% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(-10deg);
+        }
+      }
+      @keyframes flapX {
+        0% {
+          transform: rotate(10deg) scaleX(-1);
+        }
+        10% {
+          transform: rotate(0deg) scaleX(-1);
+        }
+        25% {
+          transform: rotate(30deg) scaleX(-1);
+        }
+        38% {
+          transform: rotate(0deg) scaleX(-1);
+        }
+        62% {
+          transform: rotate(28deg) scaleX(-1);
+        }
+        78% {
+          transform: rotate(0deg) scaleX(-1);
+        }
+        100% {
+          transform: rotate(10deg) scaleX(-1);
+        }
+      }
+      @keyframes heartbeat {
+        0% {
+          transform: scale(1);
+        }
+        5% {
+          transform: scale(1.1);
+        }
+        10% {
+          transform: scale(1);
+        }
+        15% {
+          transform: scale(1.1);
+        }
+        20% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .letter-content {
+        background-color: rgba(255, 255, 255, 0.95);
+        width: 90%;
+        max-width: 650px;
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        position: relative;
+        border: 2px solid #ffcce0;
+        z-index: 2;
+      }
+
+      .letter-content:before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 20px;
+        background-color: #ffcce0;
+        border-radius: 10px;
+      }
+
+      .letter-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #b33971;
+        border-bottom: 1px dashed #ffcce0;
+        padding-bottom: 15px;
+      }
+
+      .letter-header h2 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+      }
+
+      .letter-body {
+        line-height: 1.6;
+        color: #555;
+        font-size: 1.1rem;
+        min-height: 200px;
+        padding: 15px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 8px;
+        overflow-y: auto;
+        max-height: 250px;
+      }
+
+      .letter-body:focus {
+        outline: 2px solid #ffcce0;
+      }
+
+      .edit-notice {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #888;
+        font-style: italic;
+      }
+
+      .reset-button {
+        margin-top: 25px;
+        padding: 12px 25px;
+        background-color: #b33971;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(179, 57, 113, 0.3);
+        z-index: 2;
+        position: relative;
+      }
+
+      .reset-button:hover {
+        background-color: #9a2e60;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(179, 57, 113, 0.4);
+      }
+
+      /* Estados de animación */
+      .wings-opening .wing-down-left {
+        transform: rotate(0deg);
+      }
+
+      .wings-opening .wing-down-right {
+        transform: rotate(0deg) scaleX(-1);
+      }
+
+      .wings-open .initial-scene {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .wings-open .letter-container {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      /* Efecto de brillo al pasar el cursor sobre las alas */
+      .initial-scene:hover .wing-down-left,
+      .initial-scene:hover .wing-down-right {
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3)) brightness(1.1);
+      }
+
+      /* Efecto sutil en el corazón cuando se pasa el cursor sobre las alas */
+      .initial-scene:hover .heart-behind {
+        opacity: 1;
+        transform: scale(1.2) 0.3s ease;
+        animation: heartbeat 1.5s ease infinite;
+        transition: opacity 0.3s ease;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .wings-extended-container {
+          min-width: 620px;
+        }
+        .card-container {
+          height: 550px;
+        }
+
+        .initial-scene-content {
+          width: 400px;
+          height: 400px;
+        }
+
+        .heart-behind,
+        .open-heart {
+          width: max-content;
+          height: 225px;
+        }
+
+        .wing-down-left,
+        .wing-down-right {
+          width: max-content;
+          height: 215px;
+        }
+
+        .wing-down-left {
+          right: 158px;
+          top: 110px;
+        }
+
+        .wing-down-right {
+          right: 230px;
+          top: 110px;
+        }
+
+        .wing-extended-left,
+        .wing-extended-right {
+          width: max-content;
+          height: 250px;
+        }
+
+        .wing-extended-left {
+          left: 0px;
+        }
+
+        .wing-extended-right {
+          right: 0px;
+        }
+
+        .title h1 {
+          font-size: 2rem;
+        }
+
+        .letter-content {
+          padding: 25px;
+        }
+
+        .letter-header h2 {
+          font-size: 1.5rem;
+        }
+
+        .letter-body {
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .card-container {
+          height: 500px;
+        }
+
+        .initial-scene-content {
+          width: 320px;
+          height: 320px;
+        }
+
+        .heart-behind,
+        .open-heart {
+          width: 140px;
+          height: 125px;
+        }
+
+        .wing-down-left,
+        .wing-down-right {
+          width: 120px;
+          height: 170px;
+        }
+
+        .wing-down-left {
+          left: 100px;
+          top: 160px;
+        }
+
+        .wing-down-right {
+          right: 100px;
+          top: 160px;
+        }
+
+        .wing-extended-left,
+        .wing-extended-right {
+          width: 140px;
+          height: 200px;
+        }
+
+        .wing-extended-left {
+          left: 90px;
+        }
+
+        .wing-extended-right {
+          right: 90px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">
+        <h1>Llega volando hacia tí</h1>
+        <span style="font-size: large; font-weight: bold">...</span>
+      </div>
+
+      <div class="card-container" id="cardContainer">
+        <!-- Primera pantalla: Alas hacia abajo con corazón detrás -->
+        <div class="initial-scene" id="initialScene">
+          <div class="initial-scene-content">
+            <!-- Corazón detrás de las alas -->
+            <img src="corazon.png" alt="Corazón detrás" class="heart-behind" />
+            <div class="titulo" style="margin: auto 0; z-index: 1">AFECTO</div>
+            <!-- Alas hacia abajo (delante del corazón) -->
+            <img
+              src="ala.png"
+              alt="Ala izquierda hacia abajo"
+              class="wing-down-left"
+            />
+            <img
+              src="ala.png"
+              alt="Ala derecha hacia abajo"
+              class="wing-down-right"
+            />
+          </div>
+          <div class="click-instruction">
+            <i class="fas fa-hand-point-up"></i> Toca las alas para levantarlas
+          </div>
+        </div>
+
+        <!-- Segunda pantalla: Carta abierta con alas extendidas detrás -->
+        <div class="letter-container" id="letterContainer">
+          <!-- Alas extendidas detrás del corazón -->
+          <div class="wings-extended-container">
+            <img
+              src="ala.png"
+              alt="Ala izquierda extendida"
+              class="wing-extended-left"
+            />
+            <img
+              src="ala.png"
+              alt="Ala derecha extendida"
+              class="wing-extended-right"
+            />
+          </div>
+
+          <!-- Corazón abierto (más grande y con más opacidad) -->
+          <img src="corazon.png" alt="Corazón abierto" class="open-heart" />
+
+          <!-- Contenido de la carta -->
+          <div class="letter-content">
+            <div class="letter-header">
+              <h2>Afecto</h2>
+            </div>
+
+            <div class="letter-body" id="letterText" contenteditable="">
+              En el aleteo lejano, te oigo llegar, un sentir alejado.
+              <br />Mas no ausentado <br />¿Pues como a de dejar mi caja del
+              corazón? Si emplumada la dejo. <br />veo sus colores al caminar y
+              su peculiar cantar...en mi hablar. <br />Observo con gran
+              admiración, su continuo viajar. <br />Melodía eléctrica y real, es
+              su cantar. <br />Ensueñandome con la corriente de mis yemas, sus
+              plumas acariciar.
+              <br />
+            </div>
+          </div>
+
+          <button class="reset-button" id="resetButton">
+            <i class="fas fa-redo"></i> Volver a comenzar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const cardContainer = document.getElementById("cardContainer");
+        const initialScene = document.getElementById("initialScene");
+        const letterContainer = document.getElementById("letterContainer");
+        const resetButton = document.getElementById("resetButton");
+        const letterText = document.getElementById("letterText");
+        const wingDownLeft = document.querySelector(".wing-down-left");
+        const wingDownRight = document.querySelector(".wing-down-right");
+        const heartBehind = document.querySelector(".heart-behind");
+        const titulo = document.querySelector(".titulo");
+
+        // Guardar el texto original
+        const originalText = letterText.innerHTML;
+
+        // Variable para controlar si la animación está en progreso
+        let isAnimating = false;
+
+        // Abrir las alas al hacer clic
+        initialScene.addEventListener("click", function () {
+          if (isAnimating) return;
+
+          isAnimating = true;
+
+          // Agregar clase para iniciar la animación de las alas levantándose
+          cardContainer.classList.add("wings-opening");
+
+          // Efecto en el corazón mientras se levantan las alas
+          heartBehind.style.transition = "opacity 0.5s ease";
+          heartBehind.style.opacity = "1";
+
+          // Reproducir sonido de alas (opcional)
+          playWingSound();
+
+          // Después de que las alas se levanten, mostrar la carta
+          setTimeout(() => {
+            cardContainer.classList.add("wings-open");
+            isAnimating = false;
+          }, 1200); // Tiempo de la animación de levantamiento
+        });
+
+        // Cerrar las alas al hacer clic en el botón de reinicio
+        resetButton.addEventListener("click", function () {
+          if (isAnimating) return;
+
+          isAnimating = true;
+
+          // Ocultar la carta primero
+          cardContainer.classList.remove("wings-open");
+
+          // Después de un breve retraso, bajar las alas y restaurar opacidad del corazón
+          setTimeout(() => {
+            cardContainer.classList.remove("wings-opening");
+            heartBehind.style.opacity = "0.7";
+            isAnimating = false;
+          }, 500);
+        });
+
+        // Efecto al pasar el cursor sobre las alas
+        initialScene.addEventListener("mouseenter", function () {
+          if (!isAnimating && !cardContainer.classList.contains("wings-open")) {
+            wingDownLeft.style.transition =
+              "transform 0.3s ease, filter 0.3s ease";
+            wingDownRight.style.transition =
+              "transform 0.3s ease, filter 0.3s ease";
+            wingDownLeft.style.transform = "rotate(-60deg) scaleX(-1)";
+            wingDownRight.style.transform = "rotate(60deg)";
+            heartBehind.style.opacity = "1";
+            heartBehind.style.transform = "scale(1.2) 0.3s ease";
+            titulo.style.opacity = "1";
+          }
+        });
+
+        initialScene.addEventListener("mouseleave", function () {
+          if (!isAnimating && !cardContainer.classList.contains("wings-open")) {
+            wingDownLeft.style.transform = "rotate(30deg) scaleX(-1)";
+            wingDownRight.style.transform = "rotate(-30deg)";
+            heartBehind.style.opacity = "0.7";
+            heartBehind.style.transform = "scale(1) 0.3s ease";
+            titulo.style.opacity = "0";
+          }
+        });
+
+        // Función para reproducir sonido de alas (opcional)
+        function playWingSound() {
+          try {
+            // Crear un contexto de audio
+            const audioContext = new (window.AudioContext ||
+              window.webkitAudioContext)();
+
+            // Crear un oscilador para el sonido de alas
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Configurar el sonido
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(250, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(
+              150,
+              audioContext.currentTime + 0.8
+            );
+
+            // Configurar la ganancia (volumen)
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(
+              0.01,
+              audioContext.currentTime + 0.8
+            );
+
+            // Reproducir el sonido
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.8);
+          } catch (e) {
+            console.log("Audio no disponible");
+          }
+        }
+
+        // Permitir guardar el texto editado en localStorage
+        letterText.addEventListener("input", function () {
+          localStorage.setItem("cartaPersonalizadaAlas", letterText.innerHTML);
+        });
+
+        // Cargar texto guardado si existe
+        const savedText = localStorage.getItem("cartaPersonalizadaAlas");
+        if (savedText) {
+          letterText.innerHTML = savedText;
+        }
+      });
+    </script>
+  </body>
+</html>
